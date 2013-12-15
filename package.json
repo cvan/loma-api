@@ -1,0 +1,19 @@
+{
+  "name": "loma",
+  "version": "0.0.1",
+  "dependencies": {
+    "lodash": "*",
+    "node-restify-swagger": "*",
+    "node-restify-validation": "*",
+    "redis": "*",
+    "restify": "*"
+  },
+  "engines": {
+    "node": ">=0.10.x",
+    "npm": ">=1.2.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/cvan/loma.git"
+  }
+}
