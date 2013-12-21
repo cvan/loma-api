@@ -25,6 +25,7 @@ flatDB.prototype = {
 
         var baseDir = path.resolve('data', type);
         var fn = path.resolve(baseDir, utils.slugify(slug) + '.json');
+        var fnList = path.resolve(baseDir + '-list.json');
 
         if (!fs.existsSync(baseDir)) {
             console.error('Directory "' + baseDir + '" does not exist');
@@ -34,10 +35,30 @@ flatDB.prototype = {
         fs.writeFile(fn, data, 'utf8', function(err) {
             if (err) {
                 console.error('Error creating', fn + ':', err);
+                if (callback) {
+                    callback(err, data);
+                }
+                return;
             }
-            if (callback) {
-                callback(err, data);
-            }
+
+            console.log('Done writing:', fn);
+
+            var files = [];
+
+            utils.globEach(baseDir, '.json', function(file) {
+                files.push(file);
+            }, function(err) {
+                console.log('Done updating:', fnList);
+                fs.writeFile(fnList, JSON.stringify(files.sort()), 'utf8', function(err) {
+                    if (err) {
+                        console.error('Error creating', fnList + ':', err);
+                    }
+                    if (callback) {
+                        callback(err, data);
+                    }
+                });
+            });
+
         });
     },
     read: function(type, slug, callback) {
