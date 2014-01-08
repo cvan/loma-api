@@ -10,20 +10,18 @@ API for loma (list of mobile apps).
 * `nodemon app.js`
 
 
-## Sample Usage
+## Sample usage
 
-### App Submission
+### App submission
 
     curl -X POST 'http://localhost:5000/app/submit' -d 'name=Open Table&app_url=http://m.opentable.com'
 
-### App Details
+### Populate with sample data
 
-    curl 'http://localhost:5000/app/open-table/detail'
+#### Make POST requests to the submission API endpoint
 
-### App Manifest JSON (Firefox)
+    ./demo/populate.sh
 
-    curl 'http://localhost:5000/app/open-table/manifest'
+#### Generate documents primed for search indexing
 
-### App Manifest Launcher
-
-    curl 'http://localhost:5000/launch.html?https://m.opentable.com'
+    node lib/doc-processor.js

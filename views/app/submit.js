@@ -45,6 +45,7 @@ module.exports = function(server) {
         var POST = req.params;
         slug = utils.slugify(POST.slug || POST.name);
         var data = {
+            _id: slug + '~' + utils._id(),
             app_url: POST.app_url,
             appcache_path: POST.appcache_path,
             category: POST.category,

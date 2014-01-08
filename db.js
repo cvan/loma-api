@@ -2,6 +2,8 @@ var fs = require('fs');
 var path = require('path');
 var url = require('url');
 
+var _ = require('lodash');
+var Promise = require('es6-promise').Promise;
 var redis = require('redis');
 
 var redisURL = url.parse(process.env.REDIS_URL ||
@@ -26,6 +28,7 @@ flatDB.prototype = {
         var baseDir = path.resolve('data', type);
         var fn = path.resolve(baseDir, utils.slugify(slug) + '.json');
         var fnList = path.resolve(baseDir + '-list.json');
+        var fnDocs = path.resolve(baseDir + '-raw-docs.json');
 
         if (!fs.existsSync(baseDir)) {
             console.error('Directory "' + baseDir + '" does not exist');
@@ -43,20 +46,36 @@ flatDB.prototype = {
 
             console.log('Done writing:', fn);
 
-            var files = [];
+            var doc;
+            var promises = [];
 
             utils.globEach(baseDir, '.json', function(file) {
-                files.push(file);
+                promises.push(new Promise(function(resolve, reject) {
+                    // TODO: Use `fs.readFile`.
+                    doc = JSON.parse(fs.readFileSync(file));
+                    resolve([file, doc]);
+                }));
             }, function(err) {
-                console.log('Done updating:', fnList);
-                fs.writeFile(fnList, JSON.stringify(files.sort()), 'utf8', function(err) {
-                    if (err) {
-                        console.error('Error creating', fnList + ':', err);
-                    }
-                    if (callback) {
-                        callback(err, data);
-                    }
-                });
+                Promise.all(promises).then(function(docs) {
+                    var unzipped = _.unzip(docs);
+                    fs.writeFile(fnList, JSON.stringify(unzipped[0].sort()), 'utf8', function(err) {
+                        if (err) {
+                            console.error('Error creating', fnList + ':', err);
+                        }
+                        console.log('Done updating:', fnList);
+                        fs.writeFile(fnDocs, JSON.stringify(unzipped[1]), 'utf8', function(err) {
+                            if (err) {
+                                console.error('Error creating', fnList + ':', err);
+                            }
+                            console.log('Done updating:', fnData);
+                            if (callback) {
+                                callback(err, data);
+                            }
+                        });
+                    });
+                }, function(err) {
+                    console.error('Error:', err);
+                }).then(console.log, console.error);
             });
 
         });
