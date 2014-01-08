@@ -9,7 +9,7 @@ module.exports = function(server) {
         url: '/app/submit',
         swagger: {
             nickname: 'submit',
-            notes: 'Submit game',
+            notes: 'Submit app',
             summary: 'Submission'
         },
         validation: {
@@ -35,6 +35,10 @@ module.exports = function(server) {
             screenshots: {
                 description: 'Screenshots',
                 isRequired: false
+            },
+            category: {
+                description: 'Category',
+                isRequired: false
             }
         }
     }, function(req, res) {
@@ -43,6 +47,7 @@ module.exports = function(server) {
         var data = {
             app_url: POST.app_url,
             appcache_path: POST.appcache_path,
+            category: POST.category,
             default_locale: POST.default_locale,
             description: POST.description,
             developer_name: POST.developer_name,
