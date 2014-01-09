@@ -5,6 +5,7 @@
     "cheerio": "*",
     "es6-promise": "*",
     "glossary": "*",
+    "iconsnaggle": "*",
     "lodash": "*",
     "node-restify-swagger": "*",
     "node-restify-validation": "*",
