@@ -7,7 +7,8 @@ var server = require('./server');
 [
     'app/detail',
     'app/manifest',
-    'app/submit'
+    'app/submit',
+    'user/login'
 ].forEach(function(view) {
     require('./views/' + view)(server);
 });

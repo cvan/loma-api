@@ -9,6 +9,7 @@
     "lodash": "*",
     "node-restify-swagger": "*",
     "node-restify-validation": "*",
+    "node-uuid": "latest",
     "redis": "*",
     "request": "*",
     "restify": "*"
