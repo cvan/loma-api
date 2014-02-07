@@ -1,4 +1,6 @@
+var auth = require('../../lib/auth');
 var db = require('../../db');
+var user = require('../../lib/user');
 var utils = require('../../lib/utils');
 
 
@@ -41,30 +43,33 @@ module.exports = function(server) {
                 isRequired: false
             }
         }
-    }, function(req, res) {
-        var POST = req.params;
-        slug = utils.slugify(POST.slug || POST.name);
-        var data = {
-            _id: slug + '~' + utils._id(),
-            app_url: POST.app_url,
-            appcache_path: POST.appcache_path,
-            category: POST.category,
-            default_locale: POST.default_locale,
-            description: POST.description,
-            developer_name: POST.developer_name,
-            developer_url: POST.developer_url,
-            fullscreen: POST.fullscreen,
-            homepage_url: POST.homepage_url,
-            icons: POST.icons,
-            license: POST.license,
-            locales: POST.locales,
-            name: POST.name,
-            orientation: POST.orientation,
-            privacy: POST.privacy_policy,
-            screenshots: POST.screenshots,
-            slug: slug
-        };
-        db.flatfile.write('app', slug, data);
-        res.json(data);
-    });
+    }, db.redisView(function(client, done, req, res) {
+        var token = req.headers.token;
+        var email = auth.verifySSA(token);
+        if (!email) {
+            res.json(403, {error: 'bad_user'});
+            done();
+            return;
+        }
+
+        user.getUserIDFromEmail(client, email, function(err, resp) {
+            if (err || !resp) {
+                res.json(500, {error: err || 'db_error'});
+                done();
+                return;
+            }
+            var POST = req.params;
+            var slug = utils.slugify(POST.slug || POST.name);
+            var data = {
+                _id: slug + '~' + utils._id(),
+                app_url: POST.app_url,
+                name: POST.name,
+                slug: slug,
+                userID: resp
+            };
+            db.flatfile.write('app', slug, data);
+            res.json({sucess: true});
+            done();
+        });
+    }));
 };

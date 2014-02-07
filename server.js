@@ -10,6 +10,7 @@ var server = restify.createServer({
 
 server.use(restify.bodyParser());
 server.use(restify.CORS());
+server.use(restify.fullResponse());
 server.use(restify.gzipResponse());
 server.use(restify.queryParser());
 server.use(restifyValidation.validationPlugin({errorsAsArray: false}));
@@ -21,6 +22,13 @@ server.get(/\/data\/?.*/, restify.serveStatic({
 server.get(/\/static\/?.*/, restify.serveStatic({
     directory: './static'
 }));
+
+// For preflight request w/ CORS.
+server.opts(/\.*/, function (req, res, next) {
+    res.header('Access-Control-Allow-Headers', 'Token');
+    res.send(200);
+    next();
+});
 
 restifySwagger.configure(server);
 restifySwagger.loadRestifyRoutes();

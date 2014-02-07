@@ -1,4 +1,4 @@
-var settings = require('./settings_local');
+var settings = require('./settings');
 
 var db = require('./db');
 var server = require('./server');
@@ -13,6 +13,6 @@ var server = require('./server');
     require('./views/' + view)(server);
 });
 
-server.listen(process.env.PORT || 5000, function() {
+server.listen(process.env.PORT || settings.PORT || 5000, function() {
     console.log('%s listening at %s', server.name, server.url);
 });
