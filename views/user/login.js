@@ -1,6 +1,13 @@
+var request = require('request');
+
 var auth = require('../../lib/auth');
 var db = require('../../db');
+var settings = require('../../settings');
 var user = require('../../lib/user');
+var utils = require('../../lib/utils');
+
+const MOZILLIANS_API_URL = 'https://mozillians.org/api/v1/users/?app_key=' +
+    settings.MOZILLIANS_API_KEY + '&app_name=' + settings.MOZILLIANS_API_NAME;
 
 
 module.exports = function(server) {
@@ -39,18 +46,33 @@ module.exports = function(server) {
                     if (err) {
                         res.json(500, {error: err});
                         return;
-                    } else if (!resp) {
-                        resp = user.newUser(client, email);
                     }
-                    resp.avatar = user.getGravatarURL(email);
-                    res.json({
-                        error: null,
-                        token: auth.createSSA(email),
-                        settings: resp,
-                        public: user.publicUserObj(resp),
-                        permissions: {}
+                    console.log('Contacting mozillians API');
+                    request.get(MOZILLIANS_API_URL + '&email=' + email,
+                                function(err, response, body) {
+                        if (err) {
+                            return res.json(500, {error: 'mozillians_api_error'});
+                        }
+
+                        body = JSON.parse(body || '{}');
+                        var vouched = !!(body && body.objects && body.objects[0] && body.objects[0].is_vouched);
+
+                        if (resp) {
+                            resp = user.updateUser(client, resp, {dateLastLogin: utils.now(), vouched: vouched});
+                        } else {
+                            resp = user.newUser(client, email, vouched);
+                        }
+
+                        resp.avatar = user.getGravatarURL(email);
+                        res.json({
+                            error: null,
+                            token: auth.createSSA(email),
+                            settings: resp,
+                            public: user.publicUserObj(resp),
+                            permissions: {}
+                        });
+                        client.end();
                     });
-                    client.end();
                 });
             }
         );

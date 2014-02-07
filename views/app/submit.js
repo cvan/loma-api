@@ -42,6 +42,7 @@ module.exports = function(server) {
             }
         }
     }, function(req, res) {
+        console.log(req.headers);
         var POST = req.params;
         slug = utils.slugify(POST.slug || POST.name);
         var data = {
