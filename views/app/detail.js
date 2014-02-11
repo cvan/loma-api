@@ -1,5 +1,6 @@
 var _ = require('lodash');
 
+var applib = require('../../lib/app');
 var db = require('../../db');
 
 
@@ -11,35 +12,25 @@ module.exports = function(server) {
         swagger: {
             nickname: 'detail',
             notes: 'Specific details and metadata about an app',
-            summary: 'App Details'
+            summary: 'App details'
         }
-    }, function(req, res) {
+    }, db.redisView(function(client, done, req, res, wrap) {
         var GET = req.params;
         var slug = GET.slug;
 
-        var app = db.flatfile.read('app', slug);
+        if (!slug) {
+            res.json(400, {error: 'bad_app'});
+            done();
+            return;
+        }
 
-        var keys = [
-            'app_url',
-            'appcache_path',
-            'default_locale',
-            'description',
-            'developer_name',
-            'developer_url',
-            'fullscreen',
-            'homepage_url',
-            'icons',
-            'license',
-            'locales',
-            'name',
-            'orientation',
-            'privacy',
-            'screenshots',
-            'slug'
-        ];
-
-        var data = _.pick(app, keys);
-
-        res.json(data);
-    });
+        applib.getAppFromSlug(client, slug, function(err, app) {
+            if (!app) {
+                res.json(500, {error: 'db_error'});
+            } else {
+                res.json(app);
+            }
+            done();
+        });
+    }));
 };

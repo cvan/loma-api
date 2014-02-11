@@ -1,3 +1,4 @@
+var applib = require('../../lib/app');
 var auth = require('../../lib/auth');
 var db = require('../../db');
 var user = require('../../lib/user');
@@ -20,26 +21,16 @@ module.exports = function(server) {
                 isRequired: true,
                 isUrl: true
             },
-            homepage_url: {
-                description: 'Homepage URL',
-                isRequired: false,
-                isUrl: true
-            },
-            icons: {
-                description: 'Icons',
-                isRequired: false,
-            },
             name: {
                 description: 'Name',
-                isRequired: true,
-                max: 128
-            },
-            screenshots: {
-                description: 'Screenshots',
-                isRequired: false
+                isRequired: true
             },
             category: {
                 description: 'Category',
+                isRequired: false
+            },
+            keywords: {
+                description: 'Keywords',
                 isRequired: false
             }
         }
@@ -59,16 +50,21 @@ module.exports = function(server) {
                 return;
             }
             var POST = req.params;
+            // TODO: Check for only unique slug (issue #11).
             var slug = utils.slugify(POST.slug || POST.name);
             var data = {
+                // TODO: Consider removing `_id` in favour of `id`.
                 _id: slug + '~' + utils._id(),
                 app_url: POST.app_url,
+                category: POST.category,
+                created: new Date(),
+                keywords: POST.keywords,
                 name: POST.name,
                 slug: slug,
-                userID: resp
+                user_id: resp
             };
-            db.flatfile.write('app', slug, data);
-            res.json({sucess: true});
+            applib.newApp(client, data);
+            res.json(data);
             done();
         });
     }));
