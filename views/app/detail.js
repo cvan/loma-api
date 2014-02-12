@@ -1,5 +1,3 @@
-var _ = require('lodash');
-
 var applib = require('../../lib/app');
 var db = require('../../db');
 

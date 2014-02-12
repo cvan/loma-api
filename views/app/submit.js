@@ -1,6 +1,7 @@
 var applib = require('../../lib/app');
 var auth = require('../../lib/auth');
 var db = require('../../db');
+var searchlib = require('../../lib/search');
 var user = require('../../lib/user');
 var utils = require('../../lib/utils');
 
@@ -52,7 +53,7 @@ module.exports = function(server) {
             var POST = req.params;
             // TODO: Check for only unique slug (issue #11).
             var slug = utils.slugify(POST.slug || POST.name);
-            var data = {
+            var doc = {
                 // TODO: Consider removing `_id` in favour of `id`.
                 _id: slug + '~' + utils._id(),
                 app_url: POST.app_url,
@@ -63,9 +64,15 @@ module.exports = function(server) {
                 slug: slug,
                 user_id: resp
             };
-            applib.newApp(client, data);
-            res.json(data);
-            done();
+            searchlib.processDoc(doc).then(function(data) {
+                doc.doc = data;
+                applib.newApp(client, doc, function(err, resp) {
+                    res.json(doc);
+                    done();
+                });
+            }).catch(function(err) {
+                return console.error(err);
+            });
         });
     }));
 };

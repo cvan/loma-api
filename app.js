@@ -6,6 +6,8 @@ var server = require('./server');
 
 [
     'app/detail',
+    'app/list',
+    'app/search',
     'app/submit',
     'user/login'
 ].forEach(function(view) {

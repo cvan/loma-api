@@ -97,3 +97,16 @@ function redisView(view, persistent) {
     };
 }
 exports.redisView = redisView;
+
+
+function plsNoError(res, done, callback) {
+    return function(err, result) {
+        if (err) {
+            res.json(500, {error: 'db_error'});
+            done();
+            return;
+        }
+        callback(result);
+    };
+}
+exports.plsNoError = plsNoError;
