@@ -1,0 +1,19 @@
+name: loma-api
+
+instances: 1
+
+framework:
+    type: node
+    runtime: node010
+
+mem: 128
+
+hooks:
+    pre-staging:
+        - sudo apt-get install bzip2 curl libfreetype6 libfontconfig1 -y && curl -k -O https://phantomjs.googlecode.com/files/phantomjs-1.9.2-linux-x86_64.tar.bz2 && tar -xvf phantomjs-1.9.2-linux-x86_64.tar.bz2 && rm phantomjs-1.9.2-linux-x86_64.tar.bz2 && mv phantomjs-1.9.2-linux-x86_64/bin/phantomjs .
+
+processes:
+    web: npm start
+
+services:
+    ${name}-redis: redis

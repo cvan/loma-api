@@ -21,5 +21,8 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/cvan/loma-api.git"
+  },
+  "scripts": {
+    "start": "node app.js"
   }
 }
