@@ -19,10 +19,8 @@ API for loma (list of mobile apps).
 
 ### Populate with sample data
 
-#### Make POST requests to the submission API endpoint
+The following script makes for each web site a POST request to the submission
+API endpoint, fetches the content of that web site, and stores a search
+document in the database:
 
     ./demo/populate.sh
-
-#### Generate documents primed for search indexing
-
-    node lib/doc-processor.js
