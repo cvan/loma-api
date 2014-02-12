@@ -7,6 +7,7 @@ API for loma (list of mobile apps).
 
 * `npm install`
 * `cp settings_local.js.dist settings_local.js`
+* `cp settings_local.js.dist settings_prod.js`
 * `nodemon app.js`
 
 

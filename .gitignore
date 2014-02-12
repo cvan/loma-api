@@ -14,3 +14,4 @@ node_modules
 pids
 results
 settings_local.js
+settings_prod.js
