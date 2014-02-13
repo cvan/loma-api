@@ -2,3 +2,5 @@ exports.DEBUG = false;
 exports.SECRET = 'Change this to something witty.';
 exports.MOZILLIANS_API_KEY = 'iainttellingyou';
 exports.MOZILLIANS_API_NAME = 'loma';
+exports.ORIGIN = 'http://localhost:9000';
+exports.FIRESNAGGLE_ORIGIN = 'http://localhost:7000';
