@@ -44,12 +44,20 @@ module.exports = function(server) {
             return;
         }
 
-        user.getUserIDFromEmail(client, email, function(err, resp) {
+        user.getUserFromEmail(client, email, function(err, resp) {
             if (err || !resp) {
                 res.json(500, {error: err || 'db_error'});
                 done();
                 return;
             }
+
+            // Only vouched Mozillians should be able to submit sites.
+            if (!resp.vouched) {
+                res.json(403, {error: 'unvouched_user'});
+                done();
+                return;
+            }
+
             var POST = req.params;
             // TODO: Check for only unique slug (issue #11).
             var slug = utils.slugify(POST.slug || POST.name);
@@ -62,16 +70,22 @@ module.exports = function(server) {
                 keywords: POST.keywords,
                 name: POST.name,
                 slug: slug,
-                user_id: resp
+                user_id: resp.id
             };
             searchlib.processDoc(doc).then(function(data) {
                 doc.doc = data;
                 applib.newApp(client, doc, function(err, resp) {
-                    res.json(doc);
-                    done();
+                    if (err) {
+                        res.json(400, {error: 'submit_save_error'});
+                    } else {
+                        res.json(doc);
+                    }
+                    return done();
                 });
             }).catch(function(err) {
-                return console.error(err);
+                console.error(err);
+                res.json(400, {error: 'submit_fetch_error'});
+                done();
             });
         });
     }));
