@@ -4,13 +4,17 @@ var db = require('../../db');
 
 module.exports = function(server) {
     // Sample usage:
-    // % curl 'http://localhost:5000/app/open-table/detail'
+    // % curl 'http://localhost:5000/app/?slug=open-table'
     server.get({
-        url: '/app/:slug/detail',
+        url: '/app/',
         swagger: {
             nickname: 'detail',
             notes: 'Specific details and metadata about an app',
             summary: 'App details'
+        },
+        slug: {
+            description: 'Slug',
+            isRequired: true
         }
     }, db.redisView(function(client, done, req, res, wrap) {
         var GET = req.params;

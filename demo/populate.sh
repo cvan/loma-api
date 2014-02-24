@@ -2,7 +2,7 @@
 
 PORT=${PORT-5000}
 api_url='http://localhost:'${PORT}
-submit_url=${api_url}'/app/submit'
+submit_url=${api_url}'/app'
 
 submit_app() {
     curl -X POST ${submit_url} -d "${1}"

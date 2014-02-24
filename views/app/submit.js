@@ -2,15 +2,15 @@ var applib = require('../../lib/app');
 var auth = require('../../lib/auth');
 var db = require('../../db');
 var searchlib = require('../../lib/search');
-var user = require('../../lib/user');
+var userlib = require('../../lib/user');
 var utils = require('../../lib/utils');
 
 
 module.exports = function(server) {
     // Sample usage:
-    // % curl -X POST 'http://localhost:5000/app/submit' -d 'name=Open Table&app_url=http://m.opentable.com'
+    // % curl -X POST 'http://localhost:5000/app' -d 'name=Open Table&app_url=http://m.opentable.com'
     server.post({
-        url: '/app/submit',
+        url: '/app',
         swagger: {
             nickname: 'submit',
             notes: 'Submit app',
@@ -33,6 +33,10 @@ module.exports = function(server) {
             keywords: {
                 description: 'Keywords',
                 isRequired: false
+            },
+            slug: {
+                description: 'Slug',
+                isRequired: true
             }
         }
     }, db.redisView(function(client, done, req, res) {
@@ -44,15 +48,15 @@ module.exports = function(server) {
             return;
         }
 
-        user.getUserFromEmail(client, email, function(err, resp) {
-            if (err || !resp) {
+        userlib.getUserFromEmail(client, email, function(err, user) {
+            if (err || !user) {
                 res.json(500, {error: err || 'db_error'});
                 done();
                 return;
             }
 
             // Only vouched Mozillians should be able to submit sites.
-            if (!resp.vouched) {
+            if (!user.vouched) {
                 res.json(403, {error: 'unvouched_user'});
                 done();
                 return;
@@ -70,7 +74,7 @@ module.exports = function(server) {
                 keywords: POST.keywords,
                 name: POST.name,
                 slug: slug,
-                user_id: resp.id
+                user_id: user.id
             };
             searchlib.processDoc(doc).then(function(data) {
                 doc.doc = data;
@@ -80,7 +84,7 @@ module.exports = function(server) {
                     } else {
                         res.json(doc);
                     }
-                    return done();
+                    done();
                 });
             }).catch(function(err) {
                 console.error(err);

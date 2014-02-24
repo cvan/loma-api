@@ -6,6 +6,7 @@ var server = require('./server');
 
 [
     'app/detail',
+    'app/edit',
     'app/list',
     'app/search',
     'app/submit',
