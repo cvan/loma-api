@@ -1,5 +1,5 @@
 var db = require('../../db');
-var user = require('../../lib/user');
+var userlib = require('../../lib/user');
 
 
 module.exports = function(server) {
@@ -61,7 +61,7 @@ module.exports = function(server) {
 
             console.log('Attempting permission update');
 
-            user.getUserFromID(client, userID, function(err, resp) {
+            userlib.getUserFromID(client, userID, function(err, resp) {
                 if (err || !resp) {
                     res.json(500, {error: err || 'db_error'});
                     return done();
@@ -72,7 +72,7 @@ module.exports = function(server) {
                 var isRev = !!+POST.reviewer;
                 var isAdmin = !!+POST.admin;
 
-                user.updateUser(client, resp, {
+                userlib.updateUser(client, resp, {
                     permissions: {
                         developer: isDev,
                         reviewer: isRev,
