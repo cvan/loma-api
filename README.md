@@ -23,4 +23,4 @@ The following script makes for each web site a POST request to the submission
 API endpoint, fetches the content of that web site, and stores a search
 document in the database:
 
-    ./demo/populate.sh
+    ./scripts/populate.sh
