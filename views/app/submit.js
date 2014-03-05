@@ -36,7 +36,7 @@ module.exports = function(server) {
             },
             slug: {
                 description: 'Slug',
-                isRequired: true
+                isRequired: false
             }
         }
     }, db.redisView(function(client, done, req, res) {
@@ -51,15 +51,13 @@ module.exports = function(server) {
         userlib.getUserFromEmail(client, email, function(err, user) {
             if (err || !user) {
                 res.json(500, {error: err || 'db_error'});
-                done();
-                return;
+                return done();
             }
 
             // Only vouched Mozillians should be able to submit sites.
             if (!user.vouched) {
                 res.json(403, {error: 'unvouched_user'});
-                done();
-                return;
+                return done();
             }
 
             var POST = req.params;
