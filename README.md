@@ -43,3 +43,14 @@ To read the logs on stackato:
 To run shell commands on stackato:
 
     stackato run cat ../logs/stdout.log
+
+
+# Running
+
+In production:
+
+    node app.js
+
+In development:
+
+    DEBUG=1 grunt

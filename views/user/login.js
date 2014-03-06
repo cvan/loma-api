@@ -32,6 +32,7 @@ module.exports = function(server) {
             assertion,
             audience,
             function(err, body) {
+                console.error(err);
                 if (err) {
                     res.json(403, {error: 'bad_assertion'});
                     return;
