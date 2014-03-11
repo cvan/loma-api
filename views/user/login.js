@@ -3,7 +3,7 @@ var request = require('request');
 var auth = require('../../lib/auth');
 var db = require('../../db');
 var settings = require('../../settings');
-var user = require('../../lib/user');
+var userlib = require('../../lib/user');
 var utils = require('../../lib/utils');
 
 const MOZILLIANS_API_URL = 'https://mozillians.org/api/v1/users/?app_key=' +
@@ -43,7 +43,26 @@ module.exports = function(server) {
                 // server with connections that never get used.
                 var client = db.redis();
                 var email = body.email;
-                user.getUserFromEmail(client, email, function(err, resp) {
+
+                function updateUserObj(err, resp) {
+                    if (err) {
+                        console.error(err);
+                        res.json(500, {error: 'db_error'});
+                        return client.end();
+                    }
+
+                    resp.avatar = userlib.getGravatarURL(email);
+                    res.json({
+                        error: null,
+                        token: auth.createSSA(email),
+                        settings: resp,
+                        public: userlib.publicUserObj(resp),
+                        permissions: {}
+                    });
+                    client.end();
+                }
+
+                userlib.getUserFromEmail(client, email, function(err, resp) {
                     if (err) {
                         res.json(500, {error: err});
                         return;
@@ -59,20 +78,10 @@ module.exports = function(server) {
                         var vouched = !!(body && body.objects && body.objects[0] && body.objects[0].is_vouched);
 
                         if (resp) {
-                            resp = user.updateUser(client, resp, {dateLastLogin: utils.now(), vouched: vouched});
+                            userlib.updateUser(client, resp, {dateLastLogin: utils.now(), vouched: vouched}, updateUserObj);
                         } else {
-                            resp = user.newUser(client, email, vouched);
+                            userlib.newUser(client, email, vouched, updateUserbj);
                         }
-
-                        resp.avatar = user.getGravatarURL(email);
-                        res.json({
-                            error: null,
-                            token: auth.createSSA(email),
-                            settings: resp,
-                            public: user.publicUserObj(resp),
-                            permissions: {}
-                        });
-                        client.end();
                     });
                 });
             }
