@@ -80,7 +80,7 @@ module.exports = function(server) {
                         if (resp) {
                             userlib.updateUser(client, resp, {dateLastLogin: utils.now(), vouched: vouched}, updateUserObj);
                         } else {
-                            userlib.newUser(client, email, vouched, updateUserbj);
+                            userlib.newUser(client, email, vouched, updateUserObj);
                         }
                     });
                 });
