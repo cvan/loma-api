@@ -3,5 +3,6 @@ exports.SECRET = 'Change this to something witty.';
 exports.MOZILLIANS_API_KEY = 'iainttellingyou';
 exports.MOZILLIANS_API_NAME = 'loma';
 exports.ORIGIN = 'http://localhost:9000';
+exports.FIRESNAGGLE_ORIGIN = 'https://localhost:7000';
 exports.URLBOX_API_KEY = 'boop';
 exports.URLBOX_API_SECRET = 'boop';
